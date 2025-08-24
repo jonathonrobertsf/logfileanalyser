@@ -138,7 +138,7 @@ def parse_logs(files: List) -> pd.DataFrame:
     if not rows:
         return pd.DataFrame()
     df = pd.DataFrame(rows)
-    df["date"] = df["ts"].dt.floor("D")  # ensure datetime64[ns]
+    df["date"] = df["ts"].dt.floor("D")
     df["hour"] = df["ts"].dt.hour
     def _bucket(s):
         for name, rng in STATUS_BUCKETS.items():
@@ -258,7 +258,7 @@ with col1:
     else:
         start_date, end_date = min_date, max_date
     start_date = pd.to_datetime(start_date)
-    end_date = pd.to_datetime(end_date)
+    end_date = pd.to_datetime(end_date) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
 with col2:
     methods = sorted(df["method"].unique().tolist())
     method_sel = st.multiselect("HTTP methods", methods, default=methods)
@@ -283,7 +283,6 @@ if path_filter:
 
 df_filtered = df_filtered[mask]
 
-# KPIs, charts, tables, robots checks, coverage, parameter analysis, sample, footer
-# (unchanged from previous version – omitted here for brevity)
+# (rest of KPIs, charts, tables, etc. unchanged)
 
 st.caption("Built for SEO log analysis • Works best with Apache/Nginx combined logs • Add more bot patterns in BOT_PATTERNS as needed.")
