@@ -138,7 +138,7 @@ def parse_logs(files: List) -> pd.DataFrame:
     if not rows:
         return pd.DataFrame()
     df = pd.DataFrame(rows)
-    df["date"] = df["ts"].dt.floor("D")
+    df["date"] = df["ts"].dt.date  # use plain Python date objects
     df["hour"] = df["ts"].dt.hour
     def _bucket(s):
         for name, rng in STATUS_BUCKETS.items():
@@ -246,7 +246,7 @@ if df.empty:
     st.warning("No valid log lines were parsed. Check the log format (Apache/Nginx combined).")
     st.stop()
 
-min_date, max_date = df["date"].min().date(), df["date"].max().date()
+min_date, max_date = df["date"].min(), df["date"].max()
 
 df_filtered = df.copy()
 
@@ -257,8 +257,6 @@ with col1:
         start_date, end_date = date_range
     else:
         start_date, end_date = min_date, max_date
-    start_date = pd.to_datetime(start_date)
-    end_date = pd.to_datetime(end_date) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
 with col2:
     methods = sorted(df["method"].unique().tolist())
     method_sel = st.multiselect("HTTP methods", methods, default=methods)
